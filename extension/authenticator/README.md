@@ -7,6 +7,13 @@ Target Product: <span>Keycloak</span>
 Source: <https://github.com/keycloak/keycloak-quickstarts>
 
 
+# DKV
+
+Copy Target to KeyCloak repository to deploy, also in JeyCloak repo, there is in the readme.md 
+a way to test locally 
+
+
+
 What is it?
 -----------
 
