@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.keycloak.examples.authenticator;
+package org.keycloak.nemdkv.authenticator;
 
 import org.jboss.logging.Logger;
 import org.keycloak.common.util.Time;
@@ -24,7 +24,7 @@ import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 import org.keycloak.credential.CredentialTypeMetadata;
 import org.keycloak.credential.CredentialTypeMetadataContext;
-import org.keycloak.examples.authenticator.credential.SecretQuestionCredentialModel;
+import org.keycloak.nemdkv.authenticator.credential.SecretQuestionCredentialModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
@@ -34,12 +34,12 @@ import org.keycloak.models.UserModel;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionCredentialProvider implements CredentialProvider<SecretQuestionCredentialModel>, CredentialInputValidator {
-    private static final Logger logger = Logger.getLogger(SecretQuestionCredentialProvider.class);
+public class NemDkvOrganizationCredentialProvider implements CredentialProvider<SecretQuestionCredentialModel>, CredentialInputValidator {
+    private static final Logger logger = Logger.getLogger(NemDkvOrganizationCredentialProvider.class);
 
     protected KeycloakSession session;
 
-    public SecretQuestionCredentialProvider(KeycloakSession session) {
+    public NemDkvOrganizationCredentialProvider(KeycloakSession session) {
         this.session = session;
     }
 
@@ -56,6 +56,7 @@ public class SecretQuestionCredentialProvider implements CredentialProvider<Secr
         if (challengeResponse == null) {
             return false;
         }
+        //todo rico here do we the validation
         CredentialModel credentialModel = user.credentialManager().getStoredCredentialById(input.getCredentialId());
         SecretQuestionCredentialModel sqcm = getCredentialFromModel(credentialModel);
         return sqcm.getSecretQuestionSecretData().getAnswer().equals(challengeResponse);
@@ -95,9 +96,9 @@ public class SecretQuestionCredentialProvider implements CredentialProvider<Secr
         return CredentialTypeMetadata.builder()
                 .type(getType())
                 .category(CredentialTypeMetadata.Category.TWO_FACTOR)
-                .displayName(SecretQuestionCredentialProviderFactory.PROVIDER_ID)
-                .helpText("secret-question-text")
-                .createAction(SecretQuestionAuthenticatorFactory.PROVIDER_ID)
+                .displayName(NemDkvOrganizationCredentialProviderFactory.PROVIDER_ID)
+                .helpText("Selection of the active organization")
+                .createAction(NemDkvOrganizationAuthenticatorFactory.PROVIDER_ID)
                 .removeable(false)
                 .build(session);
     }

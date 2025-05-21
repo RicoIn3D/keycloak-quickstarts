@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.keycloak.examples.authenticator;
+package org.keycloak.nemdkv.authenticator;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionFactory;
@@ -27,9 +27,9 @@ import org.keycloak.models.KeycloakSessionFactory;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionRequiredActionFactory implements RequiredActionFactory {
+public class NemDkvOrganizationRequiredActionFactory implements RequiredActionFactory {
 
-    private static final SecretQuestionRequiredAction SINGLETON = new SecretQuestionRequiredAction();
+    private static final NemDkvOrganizationRequiredAction SINGLETON = new NemDkvOrganizationRequiredAction();
 
     @Override
     public RequiredActionProvider create(KeycloakSession session) {
@@ -39,12 +39,12 @@ public class SecretQuestionRequiredActionFactory implements RequiredActionFactor
 
     @Override
     public String getId() {
-        return SecretQuestionRequiredAction.PROVIDER_ID;
+        return NemDkvOrganizationRequiredAction.PROVIDER_ID;
     }
 
     @Override
     public String getDisplayText() {
-        return "Secret Question";
+        return "Nemdkv Active organization";
     }
 
     @Override

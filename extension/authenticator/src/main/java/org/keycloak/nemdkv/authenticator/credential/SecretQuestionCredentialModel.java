@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.keycloak.examples.authenticator.credential;
+package org.keycloak.nemdkv.authenticator.credential;
 
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
-import org.keycloak.examples.authenticator.credential.dto.SecretQuestionCredentialData;
-import org.keycloak.examples.authenticator.credential.dto.SecretQuestionSecretData;
+import org.keycloak.nemdkv.authenticator.credential.dto.SecretQuestionCredentialData;
+import org.keycloak.nemdkv.authenticator.credential.dto.SecretQuestionSecretData;
 import org.keycloak.util.JsonSerialization;
 
 import java.io.IOException;

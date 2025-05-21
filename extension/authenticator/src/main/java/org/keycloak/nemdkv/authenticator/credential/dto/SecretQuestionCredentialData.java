@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.keycloak.examples.authenticator.credential.dto;
+package org.keycloak.nemdkv.authenticator.credential.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,16 +24,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author <a href="mailto:alistair.doswald@elca.ch">Alistair Doswald</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionSecretData {
+public class SecretQuestionCredentialData {
 
-     private final String answer;
+    private final String question;
 
     @JsonCreator
-     public SecretQuestionSecretData(@JsonProperty("answer") String answer) {
-         this.answer = answer;
-     }
+    public SecretQuestionCredentialData(@JsonProperty("question") String question) {
+        this.question = question;
+    }
 
-    public String getAnswer() {
-        return answer;
+    public String getQuestion() {
+        return question;
     }
 }

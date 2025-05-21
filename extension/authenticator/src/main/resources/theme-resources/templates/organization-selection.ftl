@@ -6,16 +6,28 @@
         ${msg("loginTitleHtml",realm.name)}
     <#elseif section = "form">
         <form id="kc-totp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
+
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="totp" class="${properties.kcLabelClass!}">What is your mom's first name</label>
+                    <label for="organization" class="${properties.kcLabelClass!}">Select your organization</label>
                 </div>
 
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input id="totp" name="secret_answer" type="text" class="${properties.kcInputClass!}" />
+                    <select id="organization" name="organization_id" class="${properties.kcInputClass!}">
+                        <option value="">-- Select an organization --</option>
+                        <#if organizations?? && organizations?size gt 0>
+                            <#list organizations as org>
+                                <option value="${org.id}">${org.name}</option>
+                            </#list>
+                        </#if>
+                    </select>
                 </div>
+                <#if !(organizations?? && organizations?size gt 0)>
+                    <div class="form-note">
+                        <small>No organizations available.</small>
+                    </div>
+                </#if>
             </div>
-
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">

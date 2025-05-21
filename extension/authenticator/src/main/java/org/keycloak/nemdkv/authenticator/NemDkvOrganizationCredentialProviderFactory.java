@@ -14,26 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.keycloak.nemdkv.authenticator;
 
-package org.keycloak.examples.authenticator.credential.dto;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.keycloak.credential.CredentialProvider;
+import org.keycloak.credential.CredentialProviderFactory;
+import org.keycloak.models.KeycloakSession;
 
 /**
- * @author <a href="mailto:alistair.doswald@elca.ch">Alistair Doswald</a>
+ * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionCredentialData {
+public class NemDkvOrganizationCredentialProviderFactory implements CredentialProviderFactory<NemDkvOrganizationCredentialProvider> {
 
-    private final String question;
+    public static final String PROVIDER_ID =  "nemdkv-organization";
 
-    @JsonCreator
-    public SecretQuestionCredentialData(@JsonProperty("question") String question) {
-        this.question = question;
+    @Override
+    public String getId() {
+        return PROVIDER_ID;
     }
 
-    public String getQuestion() {
-        return question;
+    @Override
+    public CredentialProvider create(KeycloakSession session) {
+        return new NemDkvOrganizationCredentialProvider(session);
     }
 }

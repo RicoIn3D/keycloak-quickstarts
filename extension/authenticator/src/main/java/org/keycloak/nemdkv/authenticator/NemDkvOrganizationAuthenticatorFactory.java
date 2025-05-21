@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.keycloak.examples.authenticator;
+package org.keycloak.nemdkv.authenticator;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
@@ -33,10 +33,10 @@ import java.util.List;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionAuthenticatorFactory implements AuthenticatorFactory, ConfigurableAuthenticatorFactory {
+public class NemDkvOrganizationAuthenticatorFactory implements AuthenticatorFactory, ConfigurableAuthenticatorFactory {
 
-    public static final String PROVIDER_ID = "secret-question-authenticator";
-    private static final SecretQuestionAuthenticator SINGLETON = new SecretQuestionAuthenticator();
+    public static final String PROVIDER_ID = "nemdkv-organization-authenticator";
+    private static final NemDkvOrganizationSecretQuestionAuthenticator SINGLETON = new NemDkvOrganizationSecretQuestionAuthenticator();
 
     @Override
     public String getId() {
@@ -88,17 +88,17 @@ public class SecretQuestionAuthenticatorFactory implements AuthenticatorFactory,
 
     @Override
     public String getHelpText() {
-        return "A secret question that a user has to answer. i.e. What is your mother's maiden name.";
+        return "Select which organization to work on, if there is more than one.";
     }
 
     @Override
     public String getDisplayType() {
-        return "Secret Question";
+        return "NemDKV Organization";
     }
 
     @Override
     public String getReferenceCategory() {
-        return "Secret Question";
+        return "NemDKV Organization";
     }
 
     @Override
