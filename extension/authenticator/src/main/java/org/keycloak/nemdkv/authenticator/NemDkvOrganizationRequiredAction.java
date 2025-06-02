@@ -27,12 +27,12 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.OrganizationModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.nemdkv.authenticator.credential.OrganizationMapper;
-import org.keycloak.nemdkv.authenticator.credential.OrganizationRepresentation;
 import org.keycloak.nemdkv.authenticator.credential.SecretQuestionCredentialModel;
 import org.keycloak.organization.OrganizationProvider;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -88,7 +88,7 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         context.getUser().setSingleAttribute(ORGANIZATION_ATTRIBUTE, organization.getId());
         context.getUser().setSingleAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE, organization.getAlias());
 
-        OrganizationRepresentation dto = OrganizationMapper.toRepresentation(organization);
+        Map<String, Map<String, Object>> dto = OrganizationMapper.toAttributeFormat(organization);
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = mapper.writeValueAsString(dto);

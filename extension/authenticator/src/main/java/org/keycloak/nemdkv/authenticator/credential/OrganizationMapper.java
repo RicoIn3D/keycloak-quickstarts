@@ -1,10 +1,10 @@
 package org.keycloak.nemdkv.authenticator.credential;
 
 import org.keycloak.models.OrganizationModel;
-import org.keycloak.models.OrganizationDomainModel;
-import java.util.List;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class OrganizationMapper {
 
@@ -12,17 +12,38 @@ public class OrganizationMapper {
         if (model == null) {
             return null;
         }
-        List<String> domains = model.getDomains() != null
-                ? model.getDomains()
-                .map(OrganizationDomainModel::getName).collect(Collectors.toList())
-                : null;
 
         return new OrganizationRepresentation(
                 model.getId(),
                 model.getName(),
                 model.getAlias(),
-                domains, // returns List<String>
+                Collections.emptyList(), // Ignoring domains - returns List<String> empty
                 model.getAttributes() // returns Map<String, List<String>>
         );
+    }
+    public static OrganizationWrapper toWrappedRepresentation(OrganizationModel model) {
+        if (model == null) {
+            return null;
+        }
+
+        Map<String, OrganizationWrapper.SimpleOrganization> map =
+                Map.of(model.getAlias(), new OrganizationWrapper.SimpleOrganization(model.getId()));
+
+        return new OrganizationWrapper(map);
+    }
+    public static Map<String, Map<String, Object>> toAttributeFormat(OrganizationModel model) {
+        if (model == null) {
+            return Map.of();
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", model.getId());
+
+        // Add all attributes (which is Map<String, List<String>>)
+        if (model.getAttributes() != null) {
+            result.putAll(model.getAttributes());
+        }
+
+        return Map.of(model.getAlias(), result);
     }
 }
