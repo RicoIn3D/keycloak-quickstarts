@@ -106,6 +106,7 @@
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-server-spi-private</artifactId>
                 <version>${version.keycloak}</version>
+
             </dependency>
         </dependencies>
     </dependencyManagement>
