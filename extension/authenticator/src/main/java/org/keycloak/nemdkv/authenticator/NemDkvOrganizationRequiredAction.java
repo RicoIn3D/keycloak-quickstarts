@@ -67,12 +67,14 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         // Handle different cases based on organization count
         if (userOrganizations.isEmpty()) {
             // No organizations - just continue the flow
+            user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "");
             context.success();
             return;
         } else if (userOrganizations.size() == 1) {
             // Only one organization - set it as active and continue
-            OrganizationModel singleOrg = userOrganizations.get(0);
-            setActiveOrganization(context, singleOrg);
+            //OrganizationModel singleOrg = userOrganizations.get(0);
+            //setActiveOrganization(context, singleOrg);
+            user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "");
             context.success();
             return;
         } else {
@@ -114,7 +116,7 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         if (singleOrg.isPresent())
         {
             String orgName = singleOrg.get().getAlias();
-            System.out.println("Active organization name: " + orgName);
+            System.out.println("NemDKV - Active organization name: " + orgName);
             setActiveOrganization(context, singleOrg.get());
 
         }

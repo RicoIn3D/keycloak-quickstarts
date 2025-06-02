@@ -42,7 +42,7 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
         UserModel user = context.getUser();
         List<OrganizationModel> orgs = orgProvider.getByMember(user).collect(Collectors.toList());
 
-        System.out.println("Rico Orgs secret question");    
+        System.out.println("NemDKV Org choosing");
 
         Response challenge = context.form()
             .setAttribute("organizations", orgs)
@@ -67,24 +67,23 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
     protected boolean validateAnswer(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
 
-        System.out.println("Rico SecretQuestionAuthenticator Validate answer");
-
         String active_org = formData.getFirst("organization_id");
-        System.out.println("Rico Active org = "+active_org);
+        System.out.println("NemDKV Validate answer when cookie false "+ active_org);
+
         OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
         List<OrganizationModel> orgs = orgProvider.getByMember(context.getUser()).toList();
+
         String orgName = orgs.stream()
                 .filter(org -> org.getId().equals(active_org))
                 .map(OrganizationModel::getName)  // Assuming there's a getName() method
                 .findFirst()
                 .orElse("Unknown Organization");
 
-        System.out.println("Active organization name: " + orgName);
 
         if (active_org != null && !active_org.isBlank()) {
             context.getUser().setSingleAttribute(ORGANIZATION_ATTRIBUTE, active_org);
             context.getUser().setSingleAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE, orgName);
-            System.out.println("Rico stored active org to user attribute");
+            System.out.println("NemDkv -TO OlD stored active org to user attribute");
         }
 
 

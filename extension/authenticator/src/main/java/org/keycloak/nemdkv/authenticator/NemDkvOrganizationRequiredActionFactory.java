@@ -44,7 +44,7 @@ public class NemDkvOrganizationRequiredActionFactory implements RequiredActionFa
 
     @Override
     public String getDisplayText() {
-        return "Nemdkv Active organization";
+        return "NemDKV Active organization";
     }
 
     @Override
