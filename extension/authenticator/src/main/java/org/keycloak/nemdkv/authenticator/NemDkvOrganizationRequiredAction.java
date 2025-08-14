@@ -63,8 +63,9 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         UserModel user = context.getUser();
         List<OrganizationModel> userOrganizations  = orgProvider.getByMember(user).collect(Collectors.toList());
 
-
-        // Handle different cases based on organization count
+//TODO: RICO tHis could be the prod version:
+    /*
+    // Handle different cases based on organization count
         if (userOrganizations.isEmpty()) {
             // No organizations - just continue the flow
             user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "");
@@ -75,6 +76,20 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
             //OrganizationModel singleOrg = userOrganizations.get(0);
             //setActiveOrganization(context, singleOrg);
             user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "");
+            context.success();
+            return;
+        }*/
+        // Handle different cases based on organization count
+        if (userOrganizations.isEmpty()) {
+            // No organizations - just continue the flow
+            user.removeAttribute(ORGANIZATION_DTO_ATTRIBUTE);
+            //user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "");
+            context.success();
+            return;
+        } else if (userOrganizations.size() == 1) {
+            // Only one organization - set it as active and continue
+            user.removeAttribute(ORGANIZATION_DTO_ATTRIBUTE);
+            //user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "{}");
             context.success();
             return;
         } else {
@@ -97,6 +112,7 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
             context.getUser().setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, json);
 
         } catch (JsonProcessingException e) {
+            System.out.println("NemDKV - Json error " + organization.getName());
             throw new RuntimeException(e);
         }
 
