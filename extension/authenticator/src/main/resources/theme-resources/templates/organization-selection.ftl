@@ -10,14 +10,16 @@
             <div class="${properties.kcFormGroupClass!}">
                 <#if organizations?? && organizations?size gt 0>
                     <#assign sortedOrganizations = organizations?sort_by("name")>
-                    <div class="${properties.kcInputWrapperClass!}">
-                        <ul class="kc-organization-list">
-                            <#list sortedOrganizations as org>
-                                <li>${org.name}</li>
-                            </#list>
-                        </ul>
+                    <div class="${properties.kcLabelWrapperClass!}">
+                        <label for="organization" class="${properties.kcLabelClass!}">${msg("selectOrganization","Select your organization")}</label>
                     </div>
-                    <input type="hidden" name="organization_id" value="${sortedOrganizations[0].id}"/>
+                    <div class="${properties.kcInputWrapperClass!}">
+                        <select id="organization" name="organization_id" class="${properties.kcInputClass!}">
+                            <#list sortedOrganizations as org>
+                                <option value="${org.id}" <#if org?index == 0>selected</#if>>${org.name}</option>
+                            </#list>
+                        </select>
+                    </div>
                 <#else>
                     <div class="form-note">
                         <small>No organizations available.</small>
