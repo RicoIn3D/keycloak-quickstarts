@@ -19,12 +19,21 @@ package org.keycloak.nemdkv.authenticator;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-import org.keycloak.authentication.*;
+import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.authentication.AuthenticationFlowError;
+import org.keycloak.authentication.Authenticator;
+import org.keycloak.authentication.CredentialValidator;
 import org.keycloak.credential.CredentialProvider;
-import org.keycloak.models.*;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.OrganizationModel;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
+import org.keycloak.authentication.RequiredActionFactory;
+import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.organization.OrganizationProvider;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 /**
@@ -42,10 +51,20 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
         UserModel user = context.getUser();
         List<OrganizationModel> orgs = orgProvider.getByMember(user).collect(Collectors.toList());
 
+        if (orgs.isEmpty()) {
+            clearActiveOrganization(user);
+            context.success();
+            return;
+        }
+
+        List<OrganizationModel> sortedOrgs = orgs.stream()
+                .sorted(Comparator.comparing(OrganizationModel::getName, String.CASE_INSENSITIVE_ORDER))
+                .collect(Collectors.toList());
+
         System.out.println("NemDKV Org choosing");
 
         Response challenge = context.form()
-            .setAttribute("organizations", orgs)
+            .setAttribute("organizations", sortedOrgs)
             .createForm("organization-selection.ftl");
         context.challenge(challenge);
     }
@@ -54,7 +73,13 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
     public void action(AuthenticationFlowContext context) {
         boolean validated = validateAnswer(context);
         if (!validated) {
+            OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
+            List<OrganizationModel> orgs = orgProvider.getByMember(context.getUser())
+                    .sorted(Comparator.comparing(OrganizationModel::getName, String.CASE_INSENSITIVE_ORDER))
+                    .collect(Collectors.toList());
+
             Response challenge =  context.form()
+                    .setAttribute("organizations", orgs)
                     .setError("badSecret")
                     .createForm("organization-selection.ftl");
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
@@ -71,23 +96,20 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
         System.out.println("NemDKV Validate answer when cookie false "+ active_org);
 
         OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
-        List<OrganizationModel> orgs = orgProvider.getByMember(context.getUser()).toList();
+        List<OrganizationModel> orgs = orgProvider.getByMember(context.getUser()).collect(Collectors.toList());
 
-        String orgName = orgs.stream()
-                .filter(org -> org.getId().equals(active_org))
-                .map(OrganizationModel::getName)  // Assuming there's a getName() method
-                .findFirst()
-                .orElse("Unknown Organization");
-
-
-        if (active_org != null && !active_org.isBlank()) {
-            context.getUser().setSingleAttribute(ORGANIZATION_ATTRIBUTE, active_org);
-            context.getUser().setSingleAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE, orgName);
-            System.out.println("NemDkv -TO OlD stored active org to user attribute");
+        if (orgs.isEmpty()) {
+            clearActiveOrganization(context.getUser());
             return true;
         }
 
-        return false;
+        OrganizationModel selectedOrg = resolveOrganizationSelection(active_org, orgs);
+        if (selectedOrg == null) {
+            return false;
+        }
+
+        applyOrganizationSelection(context.getUser(), selectedOrg);
+        return true;
 
     }
 
@@ -118,5 +140,36 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
     @Override
     public NemDkvOrganizationCredentialProvider getCredentialProvider(KeycloakSession session) {
         return (NemDkvOrganizationCredentialProvider)session.getProvider(CredentialProvider.class, NemDkvOrganizationCredentialProviderFactory.PROVIDER_ID);
+    }
+
+    private OrganizationModel resolveOrganizationSelection(String selectedOrgId, List<OrganizationModel> orgs) {
+        if (orgs.isEmpty()) {
+            return null;
+        }
+
+        if (selectedOrgId == null || selectedOrgId.isBlank()) {
+            return orgs.size() == 1 ? orgs.get(0) : null;
+        }
+
+        return orgs.stream()
+                .filter(org -> org.getId().equals(selectedOrgId))
+                .findFirst()
+                .orElseGet(() -> orgs.size() == 1 ? orgs.get(0) : null);
+    }
+
+    private void applyOrganizationSelection(UserModel user, OrganizationModel organization) {
+        if (organization == null) {
+            clearActiveOrganization(user);
+            return;
+        }
+
+        user.setSingleAttribute(ORGANIZATION_ATTRIBUTE, organization.getId());
+        user.setSingleAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE, organization.getName());
+        System.out.println("NemDkv - stored active org to user attribute for " + organization.getName());
+    }
+
+    private void clearActiveOrganization(UserModel user) {
+        user.removeAttribute(ORGANIZATION_ATTRIBUTE);
+        user.removeAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE);
     }
 }

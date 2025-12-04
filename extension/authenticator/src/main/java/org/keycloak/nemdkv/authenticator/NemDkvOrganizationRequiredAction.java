@@ -33,7 +33,6 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -81,15 +80,11 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         }*/
         // Handle different cases based on organization count
         if (userOrganizations.isEmpty()) {
-            // No organizations - just continue the flow
-            user.removeAttribute(ORGANIZATION_DTO_ATTRIBUTE);
-            //user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "");
+            clearActiveOrganization(user);
             context.success();
             return;
         } else if (userOrganizations.size() == 1) {
-            // Only one organization - set it as active and continue
-            user.removeAttribute(ORGANIZATION_DTO_ATTRIBUTE);
-            //user.setSingleAttribute(ORGANIZATION_DTO_ATTRIBUTE, "{}");
+            setActiveOrganization(context, userOrganizations.get(0));
             context.success();
             return;
         } else {
@@ -117,6 +112,27 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         }
 
     }
+
+    private void clearActiveOrganization(UserModel user) {
+        user.removeAttribute(ORGANIZATION_ATTRIBUTE);
+        user.removeAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE);
+        user.removeAttribute(ORGANIZATION_DTO_ATTRIBUTE);
+    }
+
+    private OrganizationModel resolveOrganizationSelection(String selectedOrgId, List<OrganizationModel> orgs) {
+        if (orgs.isEmpty()) {
+            return null;
+        }
+
+        if (selectedOrgId == null || selectedOrgId.isBlank()) {
+            return orgs.size() == 1 ? orgs.get(0) : null;
+        }
+
+        return orgs.stream()
+                .filter(org -> org.getId().equals(selectedOrgId))
+                .findFirst()
+                .orElse(null);
+    }
     @Override
     public void processAction(RequiredActionContext context) {
 
@@ -125,19 +141,21 @@ public class NemDkvOrganizationRequiredAction implements RequiredActionProvider,
         UserModel user = context.getUser();
         OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
         List<OrganizationModel> orgs = orgProvider.getByMember(user).toList();
-        // Find the name of the active organization
-        Optional<OrganizationModel> singleOrg = orgs.stream()
-                .filter(org -> org.getId().equals(active_org)).findFirst();
 
-        if (singleOrg.isPresent())
-        {
-            String orgName = singleOrg.get().getAlias();
-            System.out.println("NemDKV - Active organization name: " + orgName);
-            setActiveOrganization(context, singleOrg.get());
-
+        OrganizationModel selectedOrganization = resolveOrganizationSelection(active_org, orgs);
+        if (selectedOrganization == null) {
+            Response challenge = context.form()
+                    .setAttribute("organizations", orgs)
+                    .setError("badSecret")
+                    .createForm("organization-selection.ftl");
+            context.challenge(challenge);
+            return;
         }
 
-       context.success();
+        System.out.println("NemDKV - Active organization name: " + selectedOrganization.getAlias());
+        setActiveOrganization(context, selectedOrganization);
+
+        context.success();
     }
 
     @Override
