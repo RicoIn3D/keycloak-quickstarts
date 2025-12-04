@@ -8,21 +8,17 @@
         <form id="kc-totp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
 
             <div class="${properties.kcFormGroupClass!}">
-                <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="organization" class="${properties.kcLabelClass!}">Select your organization</label>
-                </div>
-
-                <div class="${properties.kcInputWrapperClass!}">
-                    <select id="organization" name="organization_id" class="${properties.kcInputClass!}">
-                        <option value="">-- Select an organization --</option>
-                        <#if organizations?? && organizations?size gt 0>
-                            <#list organizations as org>
-                                <option value="${org.id}">${org.name}</option>
+                <#if organizations?? && organizations?size gt 0>
+                    <#assign sortedOrganizations = organizations?sort_by("name")>
+                    <div class="${properties.kcInputWrapperClass!}">
+                        <ul class="kc-organization-list">
+                            <#list sortedOrganizations as org>
+                                <li>${org.name}</li>
                             </#list>
-                        </#if>
-                    </select>
-                </div>
-                <#if !(organizations?? && organizations?size gt 0)>
+                        </ul>
+                    </div>
+                    <input type="hidden" name="organization_id" value="${sortedOrganizations[0].id}"/>
+                <#else>
                     <div class="form-note">
                         <small>No organizations available.</small>
                     </div>

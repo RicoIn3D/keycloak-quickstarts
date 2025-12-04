@@ -84,10 +84,11 @@ public class NemDkvOrganizationSecretQuestionAuthenticator implements Authentica
             context.getUser().setSingleAttribute(ORGANIZATION_ATTRIBUTE, active_org);
             context.getUser().setSingleAttribute(ORGANIZATION_ACTIVE_ATTRIBUTE, orgName);
             System.out.println("NemDkv -TO OlD stored active org to user attribute");
+            return true;
         }
 
+        return false;
 
-        return true;
     }
 
     @Override
