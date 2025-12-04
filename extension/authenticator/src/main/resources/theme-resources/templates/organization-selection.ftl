@@ -11,7 +11,7 @@
                 <#if organizations?? && organizations?size gt 0>
                     <#assign sortedOrganizations = organizations?sort_by("name")>
                     <div class="${properties.kcLabelWrapperClass!}">
-                        <label for="organization" class="${properties.kcLabelClass!}">${msg("selectOrganization","Select your organization")}</label>
+                        <label for="organization" class="${properties.kcLabelClass!}">Select your organization</label>
                     </div>
                     <div class="${properties.kcInputWrapperClass!}">
                         <select id="organization" name="organization_id" class="${properties.kcInputClass!}">
